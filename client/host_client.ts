@@ -1,18 +1,18 @@
-import { RpcHandlerBase } from '../../util/rpc-handler-base.ts'
+import { RpcHandlerBase } from '../rpc/rpc_handler_base.ts'
 
-export enum HostCommands {
+export enum HostMethods {
   error = 'error',
   notifyProgress = 'notifyProgress',
   notifyEnd = 'notifyEnd',
 }
 
-export class HostPlayer extends RpcHandlerBase {
+export class HostClient extends RpcHandlerBase {
   progress: number | null = null
 
   protected rpcHandlers = {
-    [HostCommands.error]: this.error,
-    [HostCommands.notifyProgress]: this.notifyProgress,
-    [HostCommands.notifyEnd]: this.notifyEnd,
+    [HostMethods.error]: this.error,
+    [HostMethods.notifyProgress]: this.notifyProgress,
+    [HostMethods.notifyEnd]: this.notifyEnd,
   }
 
   error(msg: string) {

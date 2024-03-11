@@ -1,18 +1,18 @@
-import { RpcHandlerBase } from '../../util/rpc-handler-base.ts'
+import { RpcHandlerBase } from '../rpc/rpc_handler_base.ts'
 
-export enum ClientCommands {
+export enum PlayerMethods {
   error = 'error',
   message = 'message',
   notifyStart = 'notifyStart',
   notifyEnd = 'notifyEnd',
 }
 
-export class ClientPlayer extends RpcHandlerBase {
+export class PlayerClient extends RpcHandlerBase {
   protected rpcHandlers = {
-    [ClientCommands.error]: this.error,
-    [ClientCommands.message]: this.message,
-    [ClientCommands.notifyStart]: this.notifyStart,
-    [ClientCommands.notifyEnd]: this.notifyEnd,
+    [PlayerMethods.error]: this.error,
+    [PlayerMethods.message]: this.message,
+    [PlayerMethods.notifyStart]: this.notifyStart,
+    [PlayerMethods.notifyEnd]: this.notifyEnd,
   }
 
   error(msg: string) {
