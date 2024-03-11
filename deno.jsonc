@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "test": "deno test --trace-leaks client/client_game.test.ts"
+  },
+  "imports": {
+    "std/": "https://deno.land/std@0.220.0/"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "semiColons": false
+  },
+  "lock": false
+}
