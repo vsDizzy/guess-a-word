@@ -28,7 +28,7 @@ Deno.test('sends requests', async () => {
   const rs = ReadableStream.from([
     new RpcRequest('test'),
     new RpcNotification('close'),
-  ]).pipeThrough(th.stream)
+  ]).pipeThrough(th.rpcSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [new RpcResult(4)])
@@ -39,7 +39,7 @@ Deno.test('receives handler errors', async () => {
   const rs = ReadableStream.from([
     new RpcRequest('error'),
     new RpcNotification('close'),
-  ]).pipeThrough(th.stream)
+  ]).pipeThrough(th.rpcSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [new RpcError(Error('Test error'))])
@@ -50,7 +50,7 @@ Deno.test('sends notifications', async () => {
   const rs = ReadableStream.from([
     new RpcNotification('test'),
     new RpcNotification('close'),
-  ]).pipeThrough(th.stream)
+  ]).pipeThrough(th.rpcSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [])
@@ -61,7 +61,7 @@ Deno.test('catches protocol errors', async () => {
   const rs = ReadableStream.from([
     new RpcRequest('test'),
     Promise.reject(new Error('Protocol error')),
-  ]).pipeThrough(th.stream)
+  ]).pipeThrough(th.rpcSink)
 
   const actual = Array.fromAsync(rs)
   const error = await assertRejects(() => actual)

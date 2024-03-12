@@ -17,7 +17,7 @@ Deno.test('error', async () => {
   const tc = new TestConnection()
   const rs = ReadableStream.from([
     new RpcNotification(PlayerConnectionMethods.error, 'Game error'),
-  ]).pipeThrough(tc.stream)
+  ]).pipeThrough(tc.rpcSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [])

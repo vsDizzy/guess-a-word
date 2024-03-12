@@ -13,7 +13,7 @@ Deno.test('error', async () => {
   const tc = new TestClient()
   const rs = ReadableStream.from([
     new RpcNotification(PlayerMethods.error, 'Game error'),
-  ]).pipeThrough(tc.stream)
+  ]).pipeThrough(tc.rpcSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [])
@@ -25,7 +25,7 @@ Deno.test('message', async () => {
     new RpcNotification(PlayerMethods.message, 'hello'),
     new RpcNotification(PlayerMethods.message, 'world'),
     new RpcNotification('close'),
-  ]).pipeThrough(tc.stream)
+  ]).pipeThrough(tc.rpcSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [])
@@ -35,7 +35,17 @@ Deno.test('notifyEnd', async () => {
   const tc = new TestClient()
   const rs = ReadableStream.from([
     new RpcNotification(PlayerMethods.notifyEnd),
-  ]).pipeThrough(tc.stream)
+  ]).pipeThrough(tc.rpcSink)
+
+  const actual = await Array.fromAsync(rs)
+  assertEquals(actual, [])
+})
+
+Deno.test.only('sends input', async () => {
+  const pc = new PlayerClient()
+  const rs = ReadableStream.from([
+    'bird',
+  ]).pipeThrough(pc.inputSink)
 
   const actual = await Array.fromAsync(rs)
   assertEquals(actual, [])

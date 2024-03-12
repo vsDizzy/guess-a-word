@@ -9,8 +9,8 @@ import {
 } from './rpc_types.ts'
 
 export abstract class RpcHandlerBase {
-  get stream() {
-    return toTransformStream(this.commandHandler.bind(this))
+  get rpcSink() {
+    return toTransformStream(this.listener.bind(this))
   }
 
   protected abstract rpcHandlers: {
@@ -19,7 +19,7 @@ export abstract class RpcHandlerBase {
 
   private closed = false
 
-  private async *commandHandler(
+  private async *listener(
     src: ReadableStream<RpcRequest | RpcNotification>,
   ) {
     const reader = new StreamReader(src)
@@ -28,7 +28,6 @@ export abstract class RpcHandlerBase {
         const req = await reader.read()
 
         const doResponse = isRpcRequest(req)
-        console.log(1, doResponse)
         const method = doResponse ? req.request : req.notification
         const handler = this.rpcHandlers[method] as (
           ...args: unknown[]
@@ -46,6 +45,7 @@ export abstract class RpcHandlerBase {
           if (doResponse) {
             yield new RpcError(e)
           }
+          throw e
         }
       }
     } finally {
