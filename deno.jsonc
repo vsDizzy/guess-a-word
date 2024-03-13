@@ -1,9 +1,7 @@
 {
   "tasks": {
-    // "test": "deno test --trace-leaks",
-    // "test": "deno test --trace-leaks client/player_client.test.ts"
-    // "test": "deno test --trace-leaks rpc/rpc_handler_base.test.ts"
-    "test": "deno test --trace-leaks misc-helpers/unread_stream.test.ts"
+    // "client": "deno run client/client.ts"
+    "test": "deno test --trace-leaks client/game.test.ts"
   },
   "imports": {
     "std/": "https://deno.land/std@0.219.0/"
