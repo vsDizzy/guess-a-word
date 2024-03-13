@@ -22,8 +22,8 @@ Deno.test('error', async () => {
 Deno.test('message', async () => {
   const tc = new TestClient()
   const rs = ReadableStream.from([
-    new RpcNotification(PlayerMethods.message, 'hello'),
-    new RpcNotification(PlayerMethods.message, 'world'),
+    new RpcNotification(PlayerMethods.hint, 'hello'),
+    new RpcNotification(PlayerMethods.hint, 'world'),
     new RpcNotification('close'),
   ]).pipeThrough(tc.rpcSink)
 

@@ -1,4 +1,4 @@
-import { RpcHandlerBase } from '../rpc/rpc_handler_base.ts'
+import { RpcHandlerBase } from '../rpc/rpc_handler.ts'
 
 export enum PlayerConnectionMethods {
   error = 'error',

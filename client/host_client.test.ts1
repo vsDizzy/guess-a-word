@@ -1,6 +1,6 @@
 import { assertEquals } from 'std/assert/assert_equals.ts'
 import { RpcNotification } from '../rpc/rpc_types.ts'
-import { HostClient, HostMethods } from './host_client.ts'
+import { HostClient, HostMethods } from './host_client.ts1'
 
 class TestClient extends HostClient {
   constructor() {
