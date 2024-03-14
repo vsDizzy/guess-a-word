@@ -3,15 +3,34 @@ import {
   isRpcRequest,
   isRpcResult,
   RpcMessage,
+  RpcNotification,
+  RpcRequest,
   RpcResult,
 } from './rpc_types.ts'
 
 export class RpcHandler {
   pipeline = toTransformStream(this.rpcPipe.bind(this))
   results = new TransformStream()
+  requests = new TransformStream()
   awaitingResults = 0
 
   constructor(private handlers: { [_: string]: unknown } = {}) {}
+
+  async call(method: string, ...args: unknown[]) {
+    if (this.awaitingResults != 0) {
+      await this.writeRequest({ method, args } as RpcRequest)
+    }
+  }
+
+  async notify(method: string, ...args: unknown[]) {
+    await this.writeRequest({ notification: method, args } as RpcNotification)
+  }
+
+  private writeRequest(val: unknown) {
+    return ReadableStream.from([val]).pipeTo(this.requests.writable, {
+      preventClose: true,
+    })
+  }
 
   private async *rpcPipe(
     src: ReadableStream<RpcMessage>,
