@@ -1,48 +1,81 @@
-import { toTransformStream } from 'std/streams/mod.ts'
-import { readStream } from '../misc_helpers/read_stream.ts'
-import {
-  PlayerRequest,
-  ServerErrorMessages,
-  ServerMethods,
-  ServerRequest,
-  ServerResponse,
-} from '../misc_helpers/types.ts'
+// deno-lint-ignore-file require-yield
+import { mergeReadableStreams, toTransformStream } from 'std/streams/mod.ts'
+import { readUserInput } from '../misc_helpers/read_user_input.ts'
+import { PlayerRequest, ServerRequest } from '../misc_helpers/types.ts'
+import { readOne } from '../misc_helpers/read_stream.ts'
+
+export enum GameStage {
+  preMatch,
+  started,
+}
+
+export interface GameState {
+  stage: GameStage
+  isHost: boolean
+  tries: number
+}
+
+export enum ServerMethods {
+  errorUnknownRequest,
+  listOpponents,
+}
+
+export enum PlayerMethods {
+  errorUnknownRequest,
+}
+
+const newGame: GameState = {
+  stage: GameStage.preMatch,
+  isHost: false,
+  tries: 0,
+}
 
 export class ClientConnection {
-  exit = false
+  state: GameState = newGame
+  rpcSink = toTransformStream(this.rpc.bind(this))
 
-  matchStarted = false
-  isHost = false
-
-  roundSink = toTransformStream(this.round.bind(this))
+  handlers: { [_: string]: unknown } = {
+    [PlayerMethods.errorUnknownRequest]: this.errorUnknownRequest,
+  }
 
   constructor(
-    private connection: TransformStream<
-      ServerRequest,
-      PlayerRequest | ServerResponse
-    >,
+    private connection: TransformStream<ServerRequest, PlayerRequest>,
   ) {}
 
   async pump() {
-    await this.connection.readable
-      .pipeThrough(this.roundSink)
-      .pipeTo(this.connection.writable)
+    await mergeReadableStreams(
+      this.connection.readable.pipeThrough(this.rpcSink),
+    ).pipeTo(this.connection.writable)
   }
 
-  private async *round() {
-  }
+  async *rpc(
+    src: ReadableStream<PlayerRequest>,
+  ): AsyncGenerator<ServerRequest> {
+    for await (const req of src) {
+      const handler = this.handlers[req.method]
+      if (!handler) {
+        yield { method: ServerMethods.errorUnknownRequest, args: [req.method] }
+      }
 
-  private async *callServer(
-    src: ReadableStream<unknown>,
-    method: ServerMethods,
-    ...args: unknown[]
-  ) {
-    yield { method, args: args ?? [] }
-    const res = await readStream(src) as ServerResponse
-    if (res.error) {
-      throw new Error(ServerErrorMessages[res.error])
+      yield* (handler as (...args: unknown[]) => AsyncGenerator<ServerRequest>)(
+        ...(req.args ?? []),
+      )
     }
+  }
 
-    return res.result
+  async *errorUnknownRequest(method: string) {
+    console.error('Unknown request:', method)
+    throw new Error(`Unknown request: ${method}`)
+  }
+
+  async *round(scr: ReadableStream): AsyncGenerator<ServerRequest> {
+    const req = await readOne()
+    while (true) {
+      yield { method: ServerMethods.listOpponents }
+
+      this.state = newGame
+      const playerId = Number(await readUserInput())
+      console.log('Input:', playerId)
+    }
   }
 }

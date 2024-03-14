@@ -1,6 +1,11 @@
 import { ClientConnection } from './client_connection.ts'
 
 if (import.meta.main) {
-  const cc = new ClientConnection(new TransformStream())
+  console.log('Connected:')
+
+  const cc = new ClientConnection({
+    readable: new ReadableStream(),
+    writable: new TransformStream().writable,
+  })
   await cc.pump()
 }
