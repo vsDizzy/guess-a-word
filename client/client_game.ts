@@ -1,4 +1,4 @@
-import { PlayerCommands, RpcHost, ServerCommands } from '../misc/types.ts'
+import { ClientCommands, RpcHost, ServerCommands } from '../shared/types.ts'
 import { LobbyStage } from './stages/lobby_stage.ts'
 
 export class ClientGame {
@@ -21,7 +21,7 @@ export class ClientGame {
 
   async listen() {
     for await (const { cmd, args } of this.connection.readable) {
-      if (cmd == PlayerCommands.onUnknownMethod) {
+      if (cmd == ClientCommands.onUnknownMethod) {
         console.error('Error: Unknown RPC method.')
         throw new Error('Unknown server RPC method called.')
       }

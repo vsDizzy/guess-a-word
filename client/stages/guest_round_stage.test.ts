@@ -1,6 +1,6 @@
 import { assertEquals, assertInstanceOf } from 'std/assert/mod.ts'
 import { assertSpyCall, assertSpyCalls, spy } from 'std/testing/mock.ts'
-import { ServerCommands } from '../../misc/types.ts'
+import { ServerCommands } from '../../shared/types.ts'
 import { ClientGame } from '../client_game.ts'
 import { GuestRoundStage } from './guest_round_stage.ts'
 import { LobbyStage } from './lobby_stage.ts'

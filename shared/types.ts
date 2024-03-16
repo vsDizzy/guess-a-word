@@ -6,7 +6,7 @@ export enum ServerCommands {
   endGuest,
 }
 
-export enum PlayerCommands {
+export enum ClientCommands {
   onUnknownMethod,
   onGotOpponents,
   onStarted,
