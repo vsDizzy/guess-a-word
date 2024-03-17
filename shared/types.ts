@@ -8,6 +8,7 @@ export enum ServerCommands {
 
 export enum ClientCommands {
   onUnknownMethod,
+  onServerIsFull,
   onGotOpponents,
   onStarted,
   onProgress,

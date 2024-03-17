@@ -14,6 +14,7 @@ export const toServerSequence: Record<ServerCommands, ObjectKind[]> = {
 
 export const toClientSequence: Record<ClientCommands, ObjectKind[]> = {
   [ClientCommands.onUnknownMethod]: [],
+  [ClientCommands.onServerIsFull]: [],
   [ClientCommands.onGotOpponents]: [ObjectKind.byteArray],
   [ClientCommands.onStarted]: [],
   [ClientCommands.onProgress]: [],

@@ -11,7 +11,6 @@ export class ClientGame {
   stage: RpcHost = new LobbyStage(this)
 
   async notifyServer(cmd: ServerCommands, ...args: unknown[]) {
-    await this.writer.ready
     await this.writer.write({ cmd, args })
   }
 
