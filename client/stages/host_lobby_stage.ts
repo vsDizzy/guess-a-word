@@ -1,4 +1,8 @@
-import { ClientCommands, RpcHost, ServerCommands } from '../../shared/types.ts'
+import {
+  ClientCommands,
+  RpcHost,
+  ServerCommands,
+} from '../../misc-helpers/types.ts'
 import { ClientGame } from '../client_game.ts'
 import { HostRoundStage } from './host_round_stage.ts'
 import { LobbyStage } from './lobby_stage.ts'

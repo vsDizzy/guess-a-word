@@ -1,4 +1,8 @@
-import { ClientCommands, RpcHost, ServerCommands } from '../shared/types.ts'
+import {
+  ClientCommands,
+  RpcHost,
+  ServerCommands,
+} from '../misc-helpers/types.ts'
 
 export class ServerGame {
   stage: RpcHost = new LobbyStage(this)
