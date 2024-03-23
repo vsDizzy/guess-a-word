@@ -6,6 +6,7 @@ const maxServerSlots = 0x100
 
 export class ServerHost {
   slots = new Array<SeverConnection | null>(maxServerSlots).fill(null)
+  games: { wrongTries: number; hostIsWinner: boolean }[] = []
 
   constructor(private password: string) {}
 

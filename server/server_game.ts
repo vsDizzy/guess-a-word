@@ -1,56 +1,30 @@
-import {
-  ClientCommands,
-  RpcHost,
-  ServerCommands,
-} from '../misc-helpers/types.ts'
+import { SeverConnection } from './server_connection.ts'
 
 export class ServerGame {
-  stage: RpcHost = new LobbyStage(this)
+  wrongTries = 0
 
-  private writer: WritableStreamDefaultWriter
+  constructor(
+    public hostConnection: SeverConnection,
+    public guestConnection: SeverConnection,
+  ) {}
 
-  constructor(private connection: TransformStream) {
-    this.writer = connection.writable.getWriter()
+  progress() {
+    this.wrongTries++
   }
 
-  async notifyClient(cmd: ClientCommands, ...args: unknown[]) {
-    await this.writer.write({ cmd, args })
+  givedUp() {
+    this.hostConnection.host.games.push({
+      wrongTries: this.wrongTries,
+      hostIsWinner: true,
+    })
+    this.hostConnection.wins++
   }
 
-  close() {
-    return this.writer.close()
+  win() {
+    this.hostConnection.host.games.push({
+      wrongTries: this.wrongTries,
+      hostIsWinner: false,
+    })
+    this.guestConnection.wins++
   }
-}
-
-export class LobbyStage implements RpcHost {
-  handlers = {
-    [ServerCommands.getOpponents]: this.onGetOpponents,
-    [ServerCommands.startAsHost]: this.onStartAsHost,
-  }
-
-  constructor(private game: ServerGame) {}
-
-  async onGetOpponents() {
-    const opponents = [1, 2, 3]
-    await this.game.notifyClient(ClientCommands.onGotOpponents, [opponents])
-  }
-
-  async onStartAsHost() {
-    const sideB = 1
-    await this.game.notifyClient(ClientCommands.onStarted)
-    const sideA = 2
-    await this.game.notifyClient(ClientCommands.onStarted)
-  }
-}
-
-export class HostRoundStage implements RpcHost {
-  handlers = {}
-
-  constructor(private game: ServerGame) {}
-}
-
-export class GuestRoundStage implements RpcHost {
-  handlers = {}
-
-  constructor(private game: ServerGame) {}
 }

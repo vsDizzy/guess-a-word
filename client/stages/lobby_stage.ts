@@ -1,17 +1,15 @@
-import {
-  ClientCommands,
-  RpcHost,
-  ServerCommands,
-} from '../../misc-helpers/types.ts'
+import { ClientCommands } from '../../protocol/client_commands.ts'
+import { CommandsManager } from '../../protocol/commands_manager.ts'
+import { ServerCommands } from '../../protocol/server_commands.ts'
 import { ClientGame } from '../client_game.ts'
 import { GuestRoundStage } from './guest_round_stage.ts'
 import { HostLobbyStage } from './host_lobby_stage.ts'
 
-export class LobbyStage implements RpcHost {
+export class LobbyStage implements CommandsManager {
   handlers = {
     input: this.onUserInput,
-    [ClientCommands.onGotOpponents]: this.onGotOpponents,
-    [ClientCommands.onStarted]: this.onStartedAsGuest,
+    [ClientCommands.gotOpponents]: this.onGotOpponents,
+    [ClientCommands.started]: this.onStartedAsGuest,
   }
 
   constructor(private game: ClientGame) {}

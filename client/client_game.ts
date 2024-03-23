@@ -1,8 +1,6 @@
-import {
-  ClientCommands,
-  RpcHost,
-  ServerCommands,
-} from '../misc-helpers/types.ts'
+import { ClientCommands } from '../protocol/client_commands.ts'
+import { CommandsManager } from '../protocol/commands_manager.ts'
+import { ServerCommands } from '../protocol/server_commands.ts'
 import { LobbyStage } from './stages/lobby_stage.ts'
 
 export class ClientGame {
@@ -12,7 +10,7 @@ export class ClientGame {
     this.writer = connection.writable.getWriter()
   }
 
-  stage: RpcHost = new LobbyStage(this)
+  stage: CommandsManager = new LobbyStage(this)
 
   async notifyServer(cmd: ServerCommands, ...args: unknown[]) {
     await this.writer.write({ cmd, args })

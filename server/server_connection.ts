@@ -5,8 +5,8 @@ import { ArgsReader } from '../protocol/args_reader.ts'
 import { argsToBytes } from '../protocol/args_to_bytes.ts'
 import { bytesToCommands } from '../protocol/bytes_to_commands.ts'
 import { ClientCommands } from '../protocol/client_commands.ts'
+import { CommandsManager } from '../protocol/commands_manager.ts'
 import { ServerCommands } from '../protocol/server_commands.ts'
-import { GameStage } from './game_stage.ts'
 import { serverArgsTypes } from './server_args_types.ts'
 import { ServerHost } from './server_host.ts'
 import { LobbyStage } from './stages/lobby_stage.ts'
@@ -14,7 +14,8 @@ import { LobbyStage } from './stages/lobby_stage.ts'
 const serverSignature = 'guess-a-word v0.1.0'
 
 export class SeverConnection {
-  stage: GameStage = new LobbyStage(this)
+  stage: CommandsManager = new LobbyStage(this)
+  wins = 0
 
   private src: AsyncIterator<number>
   private writer: WritableStreamDefaultWriter<Uint8Array>
@@ -52,7 +53,9 @@ export class SeverConnection {
         throw new Error(`Client reported unknown method: ${cmd}`)
       }
 
-      const handler = this.stage.handlers[cmd]
+      const handler = this.stage.handlers[cmd] as (
+        ...args: unknown[]
+      ) => Promise<void>
       if (!handler) {
         await this.notify(ClientCommands.onUnknownMethod)
         throw new Error(`Unknown method: ${cmd}`)
