@@ -1,8 +1,8 @@
 {
   "tasks": {
-    // "server": "deno run --allow-net --allow-read --allow-write server/server.ts",
-    // "client": "deno run --allow-net --allow-read --allow-write client/client.ts",
-    "test": "deno test --trace-leaks server/server_connection.test.ts"
+    "server": "deno run --allow-net --allow-read --allow-write server/server.ts",
+    "client": "deno run --allow-net --allow-read --allow-write client/client.ts",
+    "test": "deno test --trace-leaks"
   },
   "imports": {
     "std/": "https://deno.land/std@0.220.0/"

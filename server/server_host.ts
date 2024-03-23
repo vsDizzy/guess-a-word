@@ -48,8 +48,9 @@ export class ServerHost {
     try {
       await serverConnection.auth(this.password)
       await serverConnection.listen()
+    } catch (e) {
+      console.log(`Connection error:`, e)
     } finally {
-      connection.close()
       this.slots[id] = null
     }
   }

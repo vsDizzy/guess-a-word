@@ -1,7 +1,7 @@
 import { ClientCommands } from '../../protocol/client_commands.ts'
 import { CommandsManager } from '../../protocol/commands_manager.ts'
 import { ServerCommands } from '../../protocol/server_commands.ts'
-import { ClientGame } from '../client_game.ts'
+import { ClientConnection } from '../client_connection.ts'
 import { LobbyStage } from './lobby_stage.ts'
 
 export class HostRoundStage implements CommandsManager {
@@ -14,26 +14,30 @@ export class HostRoundStage implements CommandsManager {
     [ClientCommands.won]: this.onWin,
   }
 
-  constructor(private game: ClientGame) {
+  constructor(private game: ClientConnection) {
     console.log('You can type a hint:')
   }
 
   async onUserInput(word: string) {
-    await this.game.notifyServer(ServerCommands.sendMessage, word)
+    await this.game.notify(ServerCommands.sendMessage, word)
   }
 
   onProgress() {
     this.guessAttempts++
-    console.log('Guess number:', this.guessAttempts)
+    console.log('Wrong guesses:', this.guessAttempts)
   }
 
-  onLose() {
+  async onLose() {
     console.log('Words is guessed. You lose!\n')
-    this.game.stage = new LobbyStage(this.game)
+    const lobbyStage = new LobbyStage(this.game)
+    this.game.stage = lobbyStage
+    await lobbyStage.newGame()
   }
 
-  onWin() {
+  async onWin() {
     console.log('Victory! The opponent gave up.\n')
-    this.game.stage = new LobbyStage(this.game)
+    const lobbyStage = new LobbyStage(this.game)
+    this.game.stage = lobbyStage
+    await lobbyStage.newGame()
   }
 }

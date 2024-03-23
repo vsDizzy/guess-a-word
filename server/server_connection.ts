@@ -19,7 +19,6 @@ export class SeverConnection {
 
   private src: AsyncIterator<number>
   private writer: WritableStreamDefaultWriter<Uint8Array>
-  private reader: ArgsReader
 
   constructor(
     public host: ServerHost,
@@ -29,13 +28,13 @@ export class SeverConnection {
     this.src = connection.readable.pipeThrough(toTransformStream(arrayToBytes))
       .values()
     this.writer = connection.writable.getWriter()
-    this.reader = new ArgsReader(this.src)
   }
 
   async auth(password: string) {
     await this.writer.write(new TextEncoder().encode(serverSignature + '\0'))
 
-    const [clientPassword] = await this.reader.read(ArgTypes.string)
+    const reader = new ArgsReader(this.src)
+    const [clientPassword] = await reader.read(ArgTypes.string)
     if (clientPassword !== password) {
       console.log('Wrong password')
       throw new Error('Wrong password')

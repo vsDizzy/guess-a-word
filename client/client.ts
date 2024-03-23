@@ -1,6 +1,7 @@
 import { parseArgs } from 'std/cli/mod.ts'
 import { LaunchOptions } from '../misc-helpers/misc-helpers.ts'
-import { ServerHost } from './server_host.ts'
+import { ClientConnection } from './client_connection.ts'
+import { LobbyStage } from './stages/lobby_stage.ts'
 
 if (import.meta.main) {
   const options = parseCommandLine()
@@ -18,13 +19,19 @@ function parseCommandLine() {
 }
 
 async function listen({ path, host, port, pass }: LaunchOptions) {
-  const listener = path
-    ? Deno.listen({ path, transport: 'unix' })
-    : Deno.listen({ hostname: host, port })
+  const connection = path
+    ? await Deno.connect({ path, transport: 'unix' })
+    : await Deno.connect({ hostname: host, port })
   console.log(
-    'Listening on',
+    'Connecting to',
     path ? `Unix socket: ${path}` : `TCP socket: ${host}:${port}`,
   )
 
-  await new ServerHost(pass).listen(listener)
+  const clientConnection = new ClientConnection(connection)
+  await clientConnection.auth(pass)
+  await Promise.all([
+    clientConnection.listen(),
+    clientConnection.handleInput(),
+    (clientConnection.stage as LobbyStage).newGame(),
+  ])
 }

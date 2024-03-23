@@ -1,7 +1,7 @@
 import { ClientCommands } from '../../protocol/client_commands.ts'
 import { CommandsManager } from '../../protocol/commands_manager.ts'
 import { ServerCommands } from '../../protocol/server_commands.ts'
-import { ClientGame } from '../client_game.ts'
+import { ClientConnection } from '../client_connection.ts'
 import { HostRoundStage } from './host_round_stage.ts'
 import { LobbyStage } from './lobby_stage.ts'
 
@@ -12,7 +12,7 @@ export class HostLobbyStage implements CommandsManager {
     [ClientCommands.ended]: this.onStartAsHostFailed,
   }
 
-  constructor(private game: ClientGame, private playerId: number) {
+  constructor(private game: ClientConnection, private playerId: number) {
     console.log('Input a word to guess:')
   }
 
@@ -22,7 +22,8 @@ export class HostLobbyStage implements CommandsManager {
       return
     }
 
-    await this.game.notifyServer(
+    console.log('Starting new round...')
+    await this.game.notify(
       ServerCommands.startAsHost,
       this.playerId,
       word,
@@ -30,6 +31,7 @@ export class HostLobbyStage implements CommandsManager {
   }
 
   onStartedAsHost() {
+    console.log('Started Round as Host')
     this.game.stage = new HostRoundStage(this.game)
   }
 

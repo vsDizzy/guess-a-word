@@ -13,26 +13,33 @@ export class LobbyStage implements CommandsManager {
     [ServerCommands.startAsHost]: this.startAsHost,
   }
 
-  constructor(public connection: SeverConnection) {}
+  constructor(private connection: SeverConnection) {}
 
   async getOpponents() {
-    const opponents = [...this.connection.host.slots.values()].filter(
-      isDefined,
-    ).filter(
-      (c) => c instanceof LobbyStage && c != this.connection,
-    ).map((c) => c.id)
+    const opponents = [...this.connection.host.slots.values()]
+      .filter(isDefined)
+      .filter((c) => c.stage instanceof LobbyStage)
+      .filter((c) => c.id != this.connection.id)
+      .map((c) => c.id)
 
-    await this.connection.notify(ClientCommands.gotOpponents, [opponents])
+    await this.connection.notify(ClientCommands.gotOpponents, opponents)
   }
 
-  startAsHost(guestId: number, word: string) {
+  async startAsHost(guestId: number, word: string) {
+    console.log(
+      `Starting new round. Host: ${this.connection.id}. Guest: ${guestId}.`,
+    )
+
     const guestConnection = this.connection.host.slots[guestId]
-    if (!guestConnection) {
-      throw new Error('Guest connection closed.')
+    if (!(guestConnection?.stage instanceof LobbyStage)) {
+      await this.connection.notify(ClientCommands.ended)
+      return
     }
 
     const game = new ServerGame(this.connection, guestConnection)
     this.connection.stage = new HostStage(game)
     guestConnection.stage = new GuestStage(game, word)
+    await this.connection.notify(ClientCommands.started)
+    await guestConnection.notify(ClientCommands.started)
   }
 }

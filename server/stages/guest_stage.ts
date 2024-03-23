@@ -18,6 +18,7 @@ export class GuestStage implements CommandsManager {
   async sendMessage(word: string) {
     if (word != this.word) {
       await this.game.hostConnection.notify(ClientCommands.progress)
+      await this.game.guestConnection.notify(ClientCommands.progress)
       this.game.progress()
       return
     }

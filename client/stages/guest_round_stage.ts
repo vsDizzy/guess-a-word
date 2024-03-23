@@ -1,7 +1,7 @@
 import { ClientCommands } from '../../protocol/client_commands.ts'
 import { CommandsManager } from '../../protocol/commands_manager.ts'
 import { ServerCommands } from '../../protocol/server_commands.ts'
-import { ClientGame } from '../client_game.ts'
+import { ClientConnection } from '../client_connection.ts'
 import { LobbyStage } from './lobby_stage.ts'
 
 export class GuestRoundStage implements CommandsManager {
@@ -14,19 +14,19 @@ export class GuestRoundStage implements CommandsManager {
     [ClientCommands.won]: this.onWon,
   }
 
-  constructor(private game: ClientGame) {
+  constructor(private connection: ClientConnection) {
     console.log('Guess a word, ENTER to give up:')
   }
 
   async onUserInput(msg: string) {
     if (msg == '') {
       console.log('You gave up. Better luck next time.')
-      await this.game.notifyServer(ServerCommands.endGuest)
-      this.game.stage = new LobbyStage(this.game)
+      await this.connection.notify(ServerCommands.endGuest)
+      this.connection.stage = new LobbyStage(this.connection)
       return
     }
 
-    await this.game.notifyServer(ServerCommands.sendMessage, msg)
+    await this.connection.notify(ServerCommands.sendMessage, msg)
   }
 
   onProgress() {
@@ -46,6 +46,7 @@ export class GuestRoundStage implements CommandsManager {
 
   onWon() {
     console.log('Victory! You guessed the word.\n')
-    this.game.stage = new LobbyStage(this.game)
+    this.connection.stage = new LobbyStage(this.connection)
+    console.log('Press ENTER.')
   }
 }
