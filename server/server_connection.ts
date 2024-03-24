@@ -37,6 +37,7 @@ export class SeverConnection {
     const [clientPassword] = await reader.read(ArgTypes.string)
     if (clientPassword !== password) {
       console.log('Wrong password')
+      await this.writer.close()
       throw new Error('Wrong password')
     }
 

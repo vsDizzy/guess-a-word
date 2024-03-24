@@ -1,7 +1,13 @@
 import { parseArgs } from 'std/cli/mod.ts'
-import { LaunchOptions } from '../misc-helpers/misc-helpers.ts'
 import { ClientConnection } from './client_connection.ts'
 import { LobbyStage } from './stages/lobby_stage.ts'
+
+export interface LaunchOptions {
+  path?: string
+  host: string
+  port: number
+  pass: string
+}
 
 if (import.meta.main) {
   const options = parseCommandLine()

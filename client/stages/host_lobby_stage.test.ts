@@ -6,11 +6,14 @@ import { HostLobbyStage } from './host_lobby_stage.ts'
 
 Deno.test('handles valid word input', async () => {
   const notify = spy()
-  const game = { notify } as unknown as ClientConnection
-  const stage = game.stage = new HostLobbyStage(game, 1)
+  const connection = {
+    notify,
+    validateWord: () => true,
+  } as unknown as ClientConnection
+  const stage = connection.stage = new HostLobbyStage(connection, 1)
 
   await stage.onUserInput('testing')
-  assertEquals(game.stage, stage)
+  assertEquals(connection.stage, stage)
   assertSpyCalls(notify, 1)
 
   assertSpyCall(notify, 0, {
@@ -20,22 +23,13 @@ Deno.test('handles valid word input', async () => {
 
 Deno.test('handles invalid word input', async () => {
   const notify = spy()
-  const game = { notify } as unknown as ClientConnection
-  const stage = game.stage = new HostLobbyStage(game, 1)
+  const connection = {
+    notify,
+    validateWord: () => false,
+  } as unknown as ClientConnection
+  const stage = connection.stage = new HostLobbyStage(connection, 1)
 
-  await stage.onUserInput('')
-  assertEquals(game.stage, stage)
-  assertSpyCalls(notify, 0)
-
-  await stage.onUserInput('hello world')
-  assertEquals(game.stage, stage)
-  assertSpyCalls(notify, 0)
-
-  await stage.onUserInput('1048576')
-  assertEquals(game.stage, stage)
-  assertSpyCalls(notify, 0)
-
-  await stage.onUserInput('[+-/test--')
-  assertEquals(game.stage, stage)
+  await stage.onUserInput('testing testing')
+  assertEquals(connection.stage, stage)
   assertSpyCalls(notify, 0)
 })

@@ -30,10 +30,15 @@ export class ClientConnection {
     await this.writer.write(new TextEncoder().encode(password + '\0'))
     console.log('Logging in..')
 
-    const [id] = await reader.read(ArgTypes.byte)
-    console.log('ID:', id)
+    try {
+      const [id] = await reader.read(ArgTypes.byte)
+      console.log('ID:', id)
 
-    return id
+      return id
+    } catch {
+      console.error('Invalid password.')
+      Deno.exit(1)
+    }
   }
 
   async listen() {
@@ -69,5 +74,14 @@ export class ClientConnection {
       ) => Promise<void>
       await handler.call(this.stage, msg)
     }
+  }
+
+  public validateWord(value: string) {
+    const isValid = /^[a-z]+$/i.test(value)
+    if (!isValid) {
+      console.log('Please type a sigle word:')
+    }
+
+    return isValid
   }
 }

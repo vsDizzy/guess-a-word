@@ -1,10 +1,3 @@
-export interface LaunchOptions {
-  path?: string
-  host: string
-  port: number
-  pass: string
-}
-
 export function isUnixAddr(addr: Deno.Addr): addr is Deno.UnixAddr {
   return addr.transport === 'unix'
 }

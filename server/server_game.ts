@@ -1,30 +1,27 @@
+import { GameState } from './game_state.ts'
 import { SeverConnection } from './server_connection.ts'
 
 export class ServerGame {
-  wrongTries = 0
+  private gameState = new GameState()
 
   constructor(
     public hostConnection: SeverConnection,
     public guestConnection: SeverConnection,
-  ) {}
+  ) {
+    this.hostConnection.host.games.push(this.gameState)
+    this.gameState.hostId = hostConnection.id
+    this.gameState.guestId = guestConnection.id
+  }
 
   progress() {
-    this.wrongTries++
+    this.gameState.wrongTries++
   }
 
   givedUp() {
-    this.hostConnection.host.games.push({
-      wrongTries: this.wrongTries,
-      hostIsWinner: true,
-    })
-    this.hostConnection.wins++
+    this.gameState.hostIsWinner = true
   }
 
   win() {
-    this.hostConnection.host.games.push({
-      wrongTries: this.wrongTries,
-      hostIsWinner: false,
-    })
-    this.guestConnection.wins++
+    this.gameState.hostIsWinner = false
   }
 }

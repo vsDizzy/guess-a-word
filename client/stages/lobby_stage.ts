@@ -18,6 +18,7 @@ export class LobbyStage implements CommandsManager {
 
   async newGame() {
     await this.connection.notify(ServerCommands.getOpponents)
+    console.log('--------------------------------')
   }
 
   onUserInput(msg: string) {

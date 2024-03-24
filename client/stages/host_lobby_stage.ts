@@ -12,18 +12,17 @@ export class HostLobbyStage implements CommandsManager {
     [ClientCommands.ended]: this.onStartAsHostFailed,
   }
 
-  constructor(private game: ClientConnection, private playerId: number) {
+  constructor(private connection: ClientConnection, private playerId: number) {
     console.log('Input a word to guess:')
   }
 
   async onUserInput(word: string) {
-    if (!/^[a-z]+$/i.test(word)) {
-      console.log('Please type a sigle word:')
+    if (!this.connection.validateWord(word)) {
       return
     }
 
     console.log('Starting new round...')
-    await this.game.notify(
+    await this.connection.notify(
       ServerCommands.startAsHost,
       this.playerId,
       word,
@@ -32,11 +31,11 @@ export class HostLobbyStage implements CommandsManager {
 
   onStartedAsHost() {
     console.log('Started Round as Host')
-    this.game.stage = new HostRoundStage(this.game)
+    this.connection.stage = new HostRoundStage(this.connection)
   }
 
   onStartAsHostFailed() {
     console.log('Could not create a game. Restarting.\n')
-    this.game.stage = new LobbyStage(this.game)
+    this.connection.stage = new LobbyStage(this.connection)
   }
 }

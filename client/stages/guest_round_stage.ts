@@ -15,14 +15,21 @@ export class GuestRoundStage implements CommandsManager {
   }
 
   constructor(private connection: ClientConnection) {
-    console.log('Guess a word, ENTER to give up:')
+    console.log('Guess a word, or type "give up":')
   }
 
   async onUserInput(msg: string) {
-    if (msg == '') {
+    if (msg == 'give up') {
       console.log('You gave up. Better luck next time.')
       await this.connection.notify(ServerCommands.endGuest)
-      this.connection.stage = new LobbyStage(this.connection)
+      const lobbyStage = new LobbyStage(this.connection)
+      this.connection.stage = lobbyStage
+      await lobbyStage.newGame()
+      return
+    }
+
+    if (!this.connection.validateWord(msg)) {
+      console.log('Guess a word, or type "give up":')
       return
     }
 
@@ -44,9 +51,10 @@ export class GuestRoundStage implements CommandsManager {
     console.log('Hint:', message)
   }
 
-  onWon() {
+  async onWon() {
     console.log('Victory! You guessed the word.\n')
-    this.connection.stage = new LobbyStage(this.connection)
-    console.log('Press ENTER.')
+    const lobbyStage = new LobbyStage(this.connection)
+    this.connection.stage = lobbyStage
+    await lobbyStage.newGame()
   }
 }

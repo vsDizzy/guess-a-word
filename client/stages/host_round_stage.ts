@@ -14,12 +14,13 @@ export class HostRoundStage implements CommandsManager {
     [ClientCommands.won]: this.onWin,
   }
 
-  constructor(private game: ClientConnection) {
+  constructor(private connection: ClientConnection) {
     console.log('You can type a hint:')
   }
 
   async onUserInput(word: string) {
-    await this.game.notify(ServerCommands.sendMessage, word)
+    await this.connection.notify(ServerCommands.sendMessage, word)
+    console.log('You can type another hint:')
   }
 
   onProgress() {
@@ -29,15 +30,15 @@ export class HostRoundStage implements CommandsManager {
 
   async onLose() {
     console.log('Words is guessed. You lose!\n')
-    const lobbyStage = new LobbyStage(this.game)
-    this.game.stage = lobbyStage
+    const lobbyStage = new LobbyStage(this.connection)
+    this.connection.stage = lobbyStage
     await lobbyStage.newGame()
   }
 
   async onWin() {
     console.log('Victory! The opponent gave up.\n')
-    const lobbyStage = new LobbyStage(this.game)
-    this.game.stage = lobbyStage
+    const lobbyStage = new LobbyStage(this.connection)
+    this.connection.stage = lobbyStage
     await lobbyStage.newGame()
   }
 }

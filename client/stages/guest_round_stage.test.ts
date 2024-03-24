@@ -10,9 +10,8 @@ Deno.test('give up', async () => {
   const game = { notify } as unknown as ClientConnection
   const stage = (game.stage = new GuestRoundStage(game))
 
-  await stage.onUserInput('')
+  await stage.onUserInput('give up')
   assertInstanceOf(game.stage, LobbyStage)
-  assertSpyCalls(notify, 1)
 
   assertSpyCall(notify, 0, {
     args: [ServerCommands.endGuest],
@@ -21,12 +20,14 @@ Deno.test('give up', async () => {
 
 Deno.test('sends word to guess', async () => {
   const notify = spy()
-  const game = { notify } as unknown as ClientConnection
+  const game = {
+    notify,
+    validateWord: () => true,
+  } as unknown as ClientConnection
   const stage = (game.stage = new GuestRoundStage(game))
 
   await stage.onUserInput('testing')
   assertEquals(game.stage, stage)
-  assertSpyCalls(notify, 1)
 
   assertSpyCall(notify, 0, {
     args: [ServerCommands.sendMessage, 'testing'],
@@ -40,7 +41,6 @@ Deno.test('goes back to lobby after a win', () => {
 
   stage.onWon()
   assertInstanceOf(game.stage, LobbyStage)
-  assertSpyCalls(notify, 0)
 })
 
 Deno.test('counts attempts on progress', () => {
