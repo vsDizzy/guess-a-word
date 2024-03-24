@@ -1,0 +1,29 @@
+services:
+  server:
+    image: denoland/deno:ubuntu-1.41.3
+    working_dir: /app
+    command: deno task server -h server
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+  client1:
+    depends_on:
+      - server
+    tty: true
+    stdin_open: true
+    image: denoland/deno:ubuntu-1.41.3
+    working_dir: /app
+    command: deno task client -h server
+    volumes:
+      - .:/app
+  client2:
+    tty: true
+    stdin_open: true
+    depends_on:
+      - server
+    image: denoland/deno:ubuntu-1.41.3
+    working_dir: /app
+    command: deno task client -h server
+    volumes:
+      - .:/app
